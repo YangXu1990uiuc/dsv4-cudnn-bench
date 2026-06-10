@@ -1,0 +1,87 @@
+{
+  "device": "NVIDIA H100 NVL",
+  "cc": [
+    9,
+    0
+  ],
+  "rows": [
+    {
+      "op": "sparse_attn",
+      "S": 2048,
+      "S_kv": 4096,
+      "H": 64,
+      "D": 512,
+      "topk": 512,
+      "fwd_tilelang_ms": 0.6480960249900818,
+      "fwd_flashmla_ms": 0.3477439880371094,
+      "bwd_tilelang_ms": 7.43177604675293,
+      "bwd_cudnn_fe_ms": 1.5045759677886963,
+      "bwd_speedup_fe_over_tl": 4.9394488585880785
+    },
+    {
+      "op": "sparse_attn",
+      "S": 4096,
+      "S_kv": 8192,
+      "H": 64,
+      "D": 512,
+      "topk": 512,
+      "fwd_tilelang_ms": 1.3681600093841553,
+      "fwd_flashmla_ms": 0.6843839883804321,
+      "bwd_tilelang_ms": 15.206208229064941,
+      "bwd_cudnn_fe_ms": 2.9627840518951416,
+      "bwd_speedup_fe_over_tl": 5.132405184690496
+    },
+    {
+      "op": "sparse_attn",
+      "S": 8192,
+      "S_kv": 16384,
+      "H": 64,
+      "D": 512,
+      "topk": 512,
+      "fwd_tilelang_ms": 2.598720073699951,
+      "fwd_flashmla_ms": 1.45961594581604,
+      "bwd_tilelang_ms": 30.877248764038086,
+      "bwd_cudnn_fe_ms": 7.124608039855957,
+      "bwd_speedup_fe_over_tl": 4.333887364933882
+    },
+    {
+      "op": "sparse_attn",
+      "S": 2048,
+      "S_kv": 4096,
+      "H": 64,
+      "D": 512,
+      "topk": 2048,
+      "fwd_tilelang_ms": 2.0155200958251953,
+      "fwd_flashmla_ms": 1.1648319959640503,
+      "bwd_tilelang_ms": 29.34111976623535,
+      "bwd_cudnn_fe_ms": 4.808256149291992,
+      "bwd_speedup_fe_over_tl": 6.102237246773091
+    },
+    {
+      "op": "sparse_attn",
+      "S": 4096,
+      "S_kv": 8192,
+      "H": 64,
+      "D": 512,
+      "topk": 2048,
+      "fwd_tilelang_ms": 4.0648322105407715,
+      "fwd_flashmla_ms": 2.352544069290161,
+      "bwd_tilelang_ms": 62.31657409667969,
+      "bwd_cudnn_fe_ms": 10.137727737426758,
+      "bwd_speedup_fe_over_tl": 6.146996221512001
+    },
+    {
+      "op": "sparse_attn",
+      "S": 8192,
+      "S_kv": 16384,
+      "H": 64,
+      "D": 512,
+      "topk": 2048,
+      "fwd_tilelang_ms": 8.147711753845215,
+      "fwd_flashmla_ms": 5.2109761238098145,
+      "bwd_tilelang_ms": 127.50972747802734,
+      "bwd_cudnn_fe_ms": 21.93926429748535,
+      "bwd_speedup_fe_over_tl": 5.811941811223011
+    }
+  ]
+}

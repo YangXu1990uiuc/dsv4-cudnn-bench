@@ -21,13 +21,17 @@ Two kernel families are compared:
 
 ## Headline
 
-- **cuDNN-FE sparse-attn backward beats Miles tilelang backward 3–3.5× (Blackwell),
-  4.3–6.1× (Hopper)** at production shapes (topk=2048, S up to 8k). This is the
-  bulk of the "Megatron+cuDNN > tilelang" advantage.
-- **cuDNN-FE radix top-k beats `torch.topk` ~5×** — a drop-in replacement for the
+The "Megatron+cuDNN" path (FlashMLA forward + cuDNN-FE backward) beats Miles
+tilelang on **both** directions of the sparse-attention op:
+
+- **sparse-attn backward: cuDNN-FE 3.0–3.5× (Blackwell) / 4.3–6.2× (Hopper)** over
+  tilelang at production shapes (topk=2048, S up to 8k) — the bulk of the win.
+- **sparse-attn forward: FlashMLA 2.1–3.9× (Blackwell) / 1.6–2.0× (Hopper)** over
+  tilelang — reproduces & extends the earlier "~1.6×" finding.
+- **cuDNN-FE radix top-k beats `torch.topk` ~5×** — drop-in replacement for the
   indexer selection Miles does today, no tilelang change required.
-- Honest gaps: the indexer *score gemm* forward regresses ~2× vs tilelang at
-  S=8k (FE optimization item); sparse-attn forward is FlashMLA's job, not FE's.
+- Honest gap: the indexer *score gemm* forward regresses ~2× vs tilelang at S=8k
+  (FE optimization item).
 
 ## Requirements
 

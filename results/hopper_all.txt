@@ -1,0 +1,13 @@
+# sparse attention | NVIDIA H100 NVL sm90
+#      S   S_kv   H    D  topk   fwd_tl fwd_fmla   bwd_tl   bwd_fe fe/tl_bwd
+    2048   4096  64  512   512    0.648    0.348    7.432    1.505     4.94x
+    4096   8192  64  512   512    1.368    0.684   15.206    2.963     5.13x
+    8192  16384  64  512   512    2.599    1.460   30.877    7.125     4.33x
+    2048   4096  64  512  2048    2.016    1.165   29.341    4.808     6.10x
+    4096   8192  64  512  2048    4.065    2.353   62.317   10.138     6.15x
+    8192  16384  64  512  2048    8.148    5.211  127.510   21.939     5.81x
+# indexer | NVIDIA H100 NVL sm90  (cuDNN IndexerForward is sm100-only)
+#      S   S_kv  Hq  Di  topk   fwd_tl   fwd_fe  fe/tl topk_torch  topk_fe fe/torch
+    2048   4096  64 128  2048  ERROR: RuntimeError('IndexerForward requires SM100+ compute capability, found SM9')
+    4096   8192  64 128  2048  ERROR: RuntimeError('IndexerForward requires SM100+ compute capability, found SM9')
+    8192  16384  64 128  2048  ERROR: RuntimeError('IndexerForward requires SM100+ compute capability, found SM9')

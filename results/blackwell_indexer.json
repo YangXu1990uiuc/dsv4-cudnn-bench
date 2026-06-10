@@ -1,0 +1,54 @@
+{
+  "device": "NVIDIA Graphics Device",
+  "cc": [
+    10,
+    0
+  ],
+  "rows": [
+    {
+      "op": "indexer",
+      "S": 2048,
+      "S_kv": 4096,
+      "Hq": 64,
+      "Didx": 128,
+      "ratio": 4,
+      "topk": 2048,
+      "fwd_tilelang_ms": 0.1607999950647354,
+      "fwd_cudnn_fe_ms": 0.1640319973230362,
+      "fwd_speedup_fe_over_tl": 0.9802965134178313,
+      "topk_torch_ms": 0.23286400735378265,
+      "topk_cudnn_fe_ms": 0.054016001522541046,
+      "topk_speedup_fe_over_torch": 4.311018971972736
+    },
+    {
+      "op": "indexer",
+      "S": 4096,
+      "S_kv": 8192,
+      "Hq": 64,
+      "Didx": 128,
+      "ratio": 4,
+      "topk": 2048,
+      "fwd_tilelang_ms": 0.5107520222663879,
+      "fwd_cudnn_fe_ms": 0.5486080050468445,
+      "fwd_speedup_fe_over_tl": 0.9309962989380294,
+      "topk_torch_ms": 0.6469119787216187,
+      "topk_cudnn_fe_ms": 0.12057600170373917,
+      "topk_speedup_fe_over_torch": 5.365180214808511
+    },
+    {
+      "op": "indexer",
+      "S": 8192,
+      "S_kv": 16384,
+      "Hq": 64,
+      "Didx": 128,
+      "ratio": 4,
+      "topk": 2048,
+      "fwd_tilelang_ms": 1.750656008720398,
+      "fwd_cudnn_fe_ms": 3.2458560466766357,
+      "fwd_speedup_fe_over_tl": 0.5393510936853956,
+      "topk_torch_ms": 1.8616000413894653,
+      "topk_cudnn_fe_ms": 0.38067200779914856,
+      "topk_speedup_fe_over_torch": 4.890299268791229
+    }
+  ]
+}

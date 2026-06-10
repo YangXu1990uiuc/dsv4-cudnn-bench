@@ -1,0 +1,87 @@
+{
+  "device": "NVIDIA H100 NVL",
+  "cc": [
+    9,
+    0
+  ],
+  "rows": [
+    {
+      "op": "sparse_attn",
+      "S": 2048,
+      "S_kv": 4096,
+      "H": 64,
+      "D": 512,
+      "topk": 512,
+      "fwd_tilelang_ms": 0.6466240286827087,
+      "fwd_flashmla_ms": NaN,
+      "bwd_tilelang_ms": 7.442272186279297,
+      "bwd_cudnn_fe_ms": 1.5147199630737305,
+      "bwd_speedup_fe_over_tl": 4.913299070263219
+    },
+    {
+      "op": "sparse_attn",
+      "S": 4096,
+      "S_kv": 8192,
+      "H": 64,
+      "D": 512,
+      "topk": 512,
+      "fwd_tilelang_ms": 1.2540160417556763,
+      "fwd_flashmla_ms": NaN,
+      "bwd_tilelang_ms": 15.170304298400879,
+      "bwd_cudnn_fe_ms": 2.9740800857543945,
+      "bwd_speedup_fe_over_tl": 5.100839204386399
+    },
+    {
+      "op": "sparse_attn",
+      "S": 8192,
+      "S_kv": 16384,
+      "H": 64,
+      "D": 512,
+      "topk": 512,
+      "fwd_tilelang_ms": 2.5226879119873047,
+      "fwd_flashmla_ms": NaN,
+      "bwd_tilelang_ms": 30.86796760559082,
+      "bwd_cudnn_fe_ms": 7.1954240798950195,
+      "bwd_speedup_fe_over_tl": 4.28994417324756
+    },
+    {
+      "op": "sparse_attn",
+      "S": 2048,
+      "S_kv": 4096,
+      "H": 64,
+      "D": 512,
+      "topk": 2048,
+      "fwd_tilelang_ms": 1.9513280391693115,
+      "fwd_flashmla_ms": NaN,
+      "bwd_tilelang_ms": 29.207616806030273,
+      "bwd_cudnn_fe_ms": 4.81171178817749,
+      "bwd_speedup_fe_over_tl": 6.070109368934815
+    },
+    {
+      "op": "sparse_attn",
+      "S": 4096,
+      "S_kv": 8192,
+      "H": 64,
+      "D": 512,
+      "topk": 2048,
+      "fwd_tilelang_ms": 4.041056156158447,
+      "fwd_flashmla_ms": NaN,
+      "bwd_tilelang_ms": 61.72480010986328,
+      "bwd_cudnn_fe_ms": 9.928000450134277,
+      "bwd_speedup_fe_over_tl": 6.217243887114091
+    },
+    {
+      "op": "sparse_attn",
+      "S": 8192,
+      "S_kv": 16384,
+      "H": 64,
+      "D": 512,
+      "topk": 2048,
+      "fwd_tilelang_ms": 7.923488140106201,
+      "fwd_flashmla_ms": NaN,
+      "bwd_tilelang_ms": 126.90774536132812,
+      "bwd_cudnn_fe_ms": 22.055904388427734,
+      "bwd_speedup_fe_over_tl": 5.753912563563429
+    }
+  ]
+}
