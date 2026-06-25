@@ -1,0 +1,5 @@
+# indexer | NVIDIA Graphics Device sm100
+#      S   S_kv  Hq  Di  topk   fwd_tl   fwd_fe  fe/tl topk_torch  topk_fe fe/torch
+    4096   4096  64 128  2048    1.490    0.170  8.78x      0.438    0.133    3.30x
+    8192   8192  64 128  2048    5.557    0.604  9.20x      1.214    0.334    3.64x
+   16384  16384  64 128  2048   21.388    3.536  6.05x      3.670    0.908    4.04x

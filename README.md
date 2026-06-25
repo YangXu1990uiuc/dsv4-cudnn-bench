@@ -28,10 +28,9 @@ tilelang on **both** directions of the sparse-attention op:
   tilelang at production shapes (topk=2048, S up to 8k) — the bulk of the win.
 - **sparse-attn forward: FlashMLA 2.1–3.9× (Blackwell) / 1.6–2.0× (Hopper)** over
   tilelang — reproduces & extends the earlier "~1.6×" finding.
-- **cuDNN-FE radix top-k beats `torch.topk` ~5×** — drop-in replacement for the
-  indexer selection Miles does today, no tilelang change required.
-- Honest gap: the indexer *score gemm* forward regresses ~2× vs tilelang at S=8k
-  (FE optimization item).
+- **indexer (prefix-aligned, sq==s_kv): cuDNN-FE `IndexerForward` 6–9×** over
+  tilelang, **radix `IndexerTopK` 3.3–4×** over `torch.topk`. (The apples-to-apples
+  comparison needs sq==s_kv so the causal masks coincide — see RESULTS caveat.)
 
 ## Requirements
 

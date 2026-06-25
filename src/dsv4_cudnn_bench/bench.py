@@ -40,7 +40,11 @@ def _dev():
 
 
 SPARSE_SHAPES = [(1, sq, skv, 64, 512, tk) for tk in (512, 2048) for (sq, skv) in ((2048, 4096), (4096, 8192), (8192, 16384))]
-INDEXER_SHAPES = [(1, sq, skv, 64, 128, 4, 2048) for (sq, skv) in ((2048, 4096), (4096, 8192), (8192, 16384))]
+# Prefix-aligned (training/prefill): sq == s_kv, ratio == 1 so cuDNN's bottom-right
+# causal mask (q <= k + (s_kv - sq)) reduces to top-left (q <= k), matching Miles
+# TileLang -> apples-to-apples. (Earlier sq != s_kv runs were NOT comparable: the
+# two backends masked a different number of valid KV per query.)
+INDEXER_SHAPES = [(1, s, s, 64, 128, 1, 2048) for s in (4096, 8192, 16384)]
 
 
 def run_sparse_attn():

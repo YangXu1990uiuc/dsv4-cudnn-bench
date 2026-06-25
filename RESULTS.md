@@ -18,8 +18,8 @@ The "Megatron + cuDNN" path = **FlashMLA (forward) + cuDNN-FE SparseAttentionBac
 |---|---|---|
 | **sparse attention — forward** | **FlashMLA** | **2.1–3.9× / 1.6–2.0×** |
 | **sparse attention — backward** | **cuDNN-FE** | **3.0–3.5× / 4.3–6.2×** |
-| indexer — score gemm (forward) | tilelang at large S | cuDNN-FE ~2× slower at S=8k |
-| **indexer — top-k** | **cuDNN-FE (radix)** | **~5× vs torch.topk** |
+| **indexer — score gemm (forward)** | **cuDNN-FE** | **6–9× (prefix-aligned sq==s_kv)** |
+| **indexer — top-k** | **cuDNN-FE (radix)** | **~3.3–4× vs torch.topk** |
 
 - The backward dominates the wall-clock win (tilelang's bwd uses `num_stages=0`
   no-pipelining + `atomic_addx4` dKV scatter), but FlashMLA also beats tilelang
@@ -61,22 +61,32 @@ The "Megatron + cuDNN" path = **FlashMLA (forward) + cuDNN-FE SparseAttentionBac
 
 ---
 
-## Indexer (Hq=64, D=128, ratio=4, topk=2048) — Blackwell sm100 only — latency ms
+## Indexer (Hq=64, D=128, topk=2048) — Blackwell sm100 only — latency ms
 
 cuDNN-FE `IndexerForward` is sm100-only, so this comparison is Blackwell-only.
 
-| S / S_kv | tilelang fwd | cuDNN-FE fwd | FE/tl | torch.topk | cuDNN-FE TopK | **FE/torch** |
-|---|---|---|---|---|---|---|
-| 2048/4096 | 0.161 | 0.164 | 0.98× | 0.237 | 0.052 | **4.6×** |
-| 4096/8192 | 0.511 | 0.549 | 0.93× | 0.647 | 0.121 | **5.4×** |
-| 8192/16384 | 1.761 | 3.626 | **0.49×** | 1.862 | 0.381 | **4.9×** |
+**Prefix-aligned (sq == s_kv, ratio=1 → masks identical between backends)** — this
+is the Megatron training / prefill regime, and the apples-to-apples comparison:
 
-- **Score gemm (forward):** ~par at small/mid S; at S=8k cuDNN-FE `IndexerForward`
-  is ~2× slower than tilelang. Sweeping `q_stage`/`kv_stage` does **not** close
-  it (q_stage=1 unsupported; kv_stage 2/3/4 all ~3.1–3.4 ms) — a structural
-  large-S regression, an optimization item for the FE kernel team.
+| S = S_kv | tilelang fwd | cuDNN-FE fwd | **FE/tl** | torch.topk | cuDNN-FE TopK | **FE/torch** |
+|---|---|---|---|---|---|---|
+| 4096 | 1.490 | 0.170 | **8.8×** | 0.438 | 0.133 | **3.3×** |
+| 8192 | 5.557 | 0.604 | **9.2×** | 1.214 | 0.334 | **3.6×** |
+| 16384 | 21.388 | 3.536 | **6.0×** | 3.670 | 0.908 | **4.0×** |
+
+- **Score gemm (forward):** cuDNN-FE `IndexerForward` is **6–9× faster** than
+  tilelang `batched_indexer_fwd` in the prefix-aligned case.
 - **Top-k:** cuDNN-FE's radix `IndexerTopK` beats `torch.topk` (what Miles uses
-  today in `tilelang_indexer.py`) by ~5×. Drop-in replacement, no tilelang change.
+  today in `tilelang_indexer.py`) by ~3.3–4×. Drop-in, no tilelang change.
+
+> **Mask caveat (important).** When `sq != s_kv`, the two backends mask a
+> *different* number of valid KV per query — cuDNN-FE uses a bottom-right causal
+> mask (`q <= k + (s_kv - sq)`), Miles tilelang a top-left one (`q <= k`) — so
+> their forward workloads are not comparable. (h/t Jiayu Sun.) An earlier
+> `sq != s_kv` run made cuDNN-FE look ~2× slower at large S; that was the mask
+> mismatch, not the kernel. For Megatron full-prefill training, query row i maps
+> to absolute position i (`sq == s_kv`), so the masks coincide and the numbers
+> above apply. Suffix-aligned cases (decode/MTP) need separate handling.
 - Indexer **backward** is not compared: cuDNN-FE `IndexerBackward` fuses the KL
   auxiliary-loss gradient (different semantics than tilelang's plain
   dScore→dq/dk/dw), so it is not a clean drop-in head-to-head.
@@ -89,9 +99,10 @@ cuDNN-FE `IndexerForward` is sm100-only, so this comparison is Blackwell-only.
    of the end-to-end advantage.
 2. **Adopt FlashMLA forward** — 1.6–3.9× over tilelang; confirms & extends the
    earlier "~1.6×" finding (now up to ~4× on Blackwell).
-3. **Swap `torch.topk` → cuDNN-FE `IndexerTopK`** — ~5×, zero tilelang change.
-4. **FE indexer score-gemm needs work at large S** (~2× behind tilelang at
-   S=8k) before it's worth switching that one piece.
+3. **Adopt the cuDNN-FE indexer** — in the prefix-aligned (training) regime,
+   `IndexerForward` is 6–9× and `IndexerTopK` 3.3–4× over Miles' tilelang +
+   `torch.topk`. (Only the suffix-aligned `sq != s_kv` decode/MTP path needs a
+   mask-semantics check before claiming a win there.)
 
 ## Notes / caveats
 
