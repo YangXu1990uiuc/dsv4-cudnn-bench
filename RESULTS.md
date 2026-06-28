@@ -104,6 +104,28 @@ is the Megatron training / prefill regime, and the apples-to-apples comparison:
    `torch.topk`. (Only the suffix-aligned `sq != s_kv` decode/MTP path needs a
    mask-semantics check before claiming a win there.)
 
+## Fairness — is this "Miles as-shipped" vs ours?
+
+Yes. This compares cuDNN-FE / FlashMLA against the TileLang kernels **Miles
+actually runs today**, not a hypothetical best-tuned TileLang:
+
+- **No autotune in Miles' path.** Every Miles sparse-attn / indexer kernel is
+  `@tilelang.jit(...)` with **hardcoded** params (fwd `block_I=64, num_stages=2`;
+  **bwd `num_stages=0`** = no pipelining), called directly from the model
+  (`deepseek_v4.py:304 → sparse_attn_tilelang → sparse_mqa_{fwd,bwd}_interface`).
+  No `@tilelang.autotune`, no config search, no runtime tuning. (The autotune
+  discussion elsewhere concerns the *mHC* kernels in deepseek-ai/TileKernels —
+  a different codebase, not this path.)
+- **The bwd gap is not an under-tuning artifact.** Sweeping the bwd
+  `num_stages` (`scripts/bench_tilelang_bwd_tune.py`): `num_stages=1` improves
+  on the shipped `0` by only ~5%, and `num_stages>=2` **fails to compile at
+  D=512 (dynamic shared-memory overflow)** — so TileLang's bwd cannot pipeline
+  at MLA head_dim, regardless of tuning. cuDNN-FE (warp-specialized, tighter
+  SMEM) does. The ~3.3× (Blackwell) / ~5–6× (Hopper) backward gap is structural.
+- Forward (FlashMLA vs tilelang fwd) and indexer numbers use Miles' shipped
+  configs too; they were not separately autotuned (and Miles doesn't autotune
+  them), so they likewise reflect the as-shipped solution.
+
 ## Notes / caveats
 
 - Backward kernel runtime is determined by shapes (topk_idxs / topk_length),
